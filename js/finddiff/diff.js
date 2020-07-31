@@ -41,8 +41,12 @@ var circles = []
 var circlesTmp = []
 var graphics
 var radius = 30
+var scoreText
+var score = 0
 
 function create() {
+    
+    scoreText = this.add.text(200, 0, '分数: 0', {fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', fontSize: '30px'})
     
     let sprite = this.add.sprite(500, 510, 'sc1')
     graphics = this.add.graphics({ fillStyle: { color: 0xff0000 }, lineStyle: { width: 2, color: 0x00ff00 } })
@@ -64,7 +68,9 @@ function create() {
                     circle.setEmpty()
                 })
             } else {
-                console.log("匹配上了, 结果数据: ", circles, " 临时数据: ", circlesTmp)
+                // 这里更新我们的分数
+                score += 10
+                scoreText.setText("分数: " + score)
             }
 
             circlesTmp = []
@@ -185,5 +191,5 @@ function checkClickPointerIsDiffPoint(circles) {
 function update() {
     let x = this.input.activePointer.x
     let y = this.input.activePointer.y
-    // console.log("curr x pointer ", x, " curr y pointer ", y)
+    console.log("curr x pointer ", x, " curr y pointer ", y)
 }
