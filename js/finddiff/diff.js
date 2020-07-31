@@ -18,6 +18,12 @@ var config = {
  */
 var coordinateMap = {
     "55": [320, 60, 805],
+    "135": [470, 110, 890],
+    "280": [385, 270, 810],
+    "355": [450, 320, 860],
+    "465": [430, 472, 860],
+    "520": [310, 525, 740],
+    "570": [330, 550, 760],
     
 }
 
@@ -105,14 +111,16 @@ function checkClickPointerIsDiffPoint(circles) {
     keys.sort()
 
 
-    let r = radius / 2
+    
     let m = click1.x
 
-    if (keys.indexOf(m) != -1 || keys.indexOf(m - r) != -1 || keys.indexOf(m + r) != -1) {
+    console.log("当前点击的x位置为: ", m, " 往左推算为: ", m - radius, " 往右推算为: ", m + radius)
+
+    if (keys.indexOf(m) != -1 || keys.indexOf(m - radius) != -1 || keys.indexOf(m + radius) != -1) {
         values = coordinateMap[m]
     } else {
-        arrLK = selectLeftPointer(m, r, keys)
-        arrRK = selectRightPointer(m, r, keys)
+        arrLK = selectLeftPointer(m, radius, keys)
+        arrRK = selectRightPointer(m, radius, keys)
 
         if (arrLK !== -1 || arrRK !== -1) {
             
@@ -144,11 +152,11 @@ function checkClickPointerIsDiffPoint(circles) {
         return k
     }
 
-    function selectLeftPointer(x, keys) {
+    function selectLeftPointer(x, r, keys) {
         let k = -1
         for (let i = 0; i < keys.length; i ++) {
-            if (keys[i] < x && keys[i] > x + r) {
-                arr[0] = keys[i]
+            if (keys[i] < x && keys[i] > x - r) {
+                k = keys[i]
                 break
             }
         }
