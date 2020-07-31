@@ -36,8 +36,9 @@ function preload() {
 }
 
 
-var clickCount = 0
+
 var circles = []
+var circlesTmp = []
 var graphics
 var radius = 30
 
@@ -45,131 +46,144 @@ function create() {
     
     let sprite = this.add.sprite(500, 510, 'sc1')
     graphics = this.add.graphics({ fillStyle: { color: 0xff0000 }, lineStyle: { width: 2, color: 0x00ff00 } })
-    sprite.inputEnabled = true
+    // sprite.inputEnabled = true
     sprite.setInteractive()
 
     sprite.on('pointerdown', function(pointer) {
-        console.log("click pointer ", pointer)
         let circle = new Phaser.Geom.Circle(pointer.x, pointer.y, radius)
-        circle.name = 'DELETE'
         graphics.strokeCircleShape(circle)
         circles.push(circle)
-        clickCount ++
-        console.log("pointerdown clickCount ", clickCount)
+        circlesTmp.push(circle)
+        console.log("鼠标点击了 ", circles)
     })
 
     sprite.on('pointerup', function(pointer) {
-
-        console.log("pointerup clickCount ", clickCount)
-        
-        if (clickCount == 2) {
-            if (checkClickPointerIsDiffPoint(circles)) {
-                console.log("开始处理成功时候的程序")
-                circles.forEach(function(circle) {
-                    circle.name = 'SAVE'
+        if (circlesTmp.length === 2) {
+            if (!checkClickPointerIsDiffPoint(circlesTmp)) {
+                circlesTmp.forEach(function (circle) {
+                    circle.setEmpty()
                 })
-
-                console.log("匹配成功后, 开始绘制...")
             } else {
-                console.log("开始处理失败时候的程序")
-                circles.forEach(function(circle) {
-                    if (circle.name = 'DELETE') {
-                        circle = circle.setEmpty()
-                    }
-                })
+                console.log("匹配上了, 结果数据: ", circles, " 临时数据: ", circlesTmp)
             }
 
+            circlesTmp = []
             redraw()
-            
-            clickCount = 0
-            
         }
-
-        
     })
-}
 
-
-function redraw() {
-
-    console.log("删除之前: ", circles)
-    graphics.clear()
-    for(let i = 0; i < circles.length; i ++) {
-        if (!circles[i].isEmpty()) {
-            // graphics.strokeCircleShape(circles[i])
-        } else {
-            circles.splice(circles.indexOf(circles[i]), 1)
+    function redraw() {
+        graphics.clear()
+        for(let i = 0; i < circles.length; i ++) {
+            graphics.strokeCircleShape(circles[i])
         }
     }
-
-    console.log("删除之后: ", circles)
-
-    for(let i = 0; i < circles.length; i ++) {
-        graphics.strokeCircleShape(circles[i])
-    }
 }
+
+
+
 
 
 
 
 function checkClickPointerIsDiffPoint(circles) {
+    console.log("刚开始进来")
     let click1 = circles[0]
     let click2 = circles[1]
 
     let keys = Object.keys(coordinateMap)
     let values = []
 
-    for (let i = 0; i < keys.length; i ++) {
-        let key = keys[i]
-        if (click1.x === key) {
-            values = coordinateMap[click1.x]
-            break
-        } else if (click1.x < key && click1.x + radius >= key) {
-            for (let i = click1.x + radius ; i <= key; i ++) {
-                if (i == key) {
-                    values = coordinateMap[i]
-                    break
+    console.log("到keys")
+
+    keys.sort()
+
+
+    let r = radius / 2
+    let m = click1.x
+
+    if (keys.indexOf(m) != -1 || keys.indexOf(m - r) != -1 || keys.indexOf(m + r) != -1) {
+        values = coordinateMap[m]
+    } else {
+        arrLK = selectLeftPointer(m, r, keys)
+        arrRK = selectRightPointer(m, r, keys)
+
+        if (arrLK !== -1 || arrRK !== -1) {
+            
+            if (arrLK !== -1) {
+                values = coordinateMap[arrLK]
+            } else if (arrRK !== -1) {
+                values = coordinateMap[arrRK]
+            } else {
+            
+                if ( (x - arrLK) < (x - arrRK) ) {
+                    values = coordinateMap[arrLK]
+                } else {
+                    values = coordinateMap[arrRK]
                 }
             }
-
-            break
-        } else if (click1.x > key && (click1.x - radius <= key )) {
-            for (let i = click1.x - radius ; i <= key; i --) {
-                if (i == key) {
-                    values = coordinateMap[i]
-                    break
-                }
-            }
-
-            break
         }
     }
 
-    console.log("values ", values)
 
+    function selectRightPointer(x, r, keys) {
+        let k = -1
+        for (let i = 0; i < keys.length; i ++) {
+            if (keys[i] > x && keys[i] < x + r) {
+                k = keys[i]
+                break
+            }
+        }
+
+        return k
+    }
+
+    function selectLeftPointer(x, keys) {
+        let k = -1
+        for (let i = 0; i < keys.length; i ++) {
+            if (keys[i] < x && keys[i] > x + r) {
+                arr[0] = keys[i]
+                break
+            }
+        }
+
+        return k
+    }
+
+    console.log("循环结束")
+
+    
     if (values.length === 0) {
         return false
     }
+
+    console.log("第一次x比较")
 
     if (click1.y !== values[0] && !(click1.y > values[0] && click1.y - radius <= values[0]) && !(click1.y < values[0] && click1.y + radius >= values[0])) {
         return false
     }
 
+    console.log("第一次y比较")
+
     if (click2.x !== values[1] && !(click2.x > values[1] && click2.x - radius <= values[1]) && !(click2.x < values[1] && click2.x + radius >= values[1])) {
         return false
     }
+
+    console.log("第二次x比较")
 
     if (click2.y !== values[2] && !(click2.y > values[2] && click2.y - radius <= values[2]) && !(click2.y < values[2] && click2.y + radius >= values[2])) {
         return false
     }
 
+    console.log("第二次y比较")
+
     return true
 
-    console.log("checkClickPointerIsDiffPoint x ", x , " y ", y)
+    // console.log("checkClickPointerIsDiffPoint x ", x , " y ", y)
 }
 
 function update() {
     let x = this.input.activePointer.x
     let y = this.input.activePointer.y
-    console.log("curr x pointer ", x, " curr y pointer ", y)
+    // console.log("curr x pointer ", x, " curr y pointer ", y)
 }
