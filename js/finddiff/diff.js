@@ -8,7 +8,7 @@ var config = {
     scene: {
         preload: preload,
         create: create,
-        // update: update
+        update: update
     }
 }
 
@@ -39,10 +39,13 @@ var diffBuff = {
 function preload() {
     this.load.path = "../../resources/img/finddiff/"
     this.load.image('sc1', 'sc1.jpg')
+    this.load.image('bg', 'bg.jpeg')
+    this.load.image('mask', 'mask1.png')
 }
 
 
-
+var black
+var spotlight
 var circles = []
 var circlesTmp = []
 var graphics
@@ -51,6 +54,8 @@ var scoreText
 var score = 0
 
 function create() {
+
+    
     
     scoreText = this.add.text(200, 0, '分数: 0', {fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', fontSize: '30px'})
     
@@ -58,6 +63,32 @@ function create() {
     graphics = this.add.graphics({ fillStyle: { color: 0xff0000 }, lineStyle: { width: 2, color: 0x00ff00 } })
     // sprite.inputEnabled = true
     sprite.setInteractive()
+
+    black = this.add.image(815, 745, 'bg')
+    black.setDisplaySize(350, 235)
+
+
+    spotlight = this.make.sprite({
+        x: 815,
+        y: 745,
+        key: 'mask',
+        add: false
+    })
+
+
+    // black.mask = new Phaser.Display.Masks.BitmapMask(this, spotlight);
+
+    // this.input.on('pointermove', function (pointer) {
+
+    //     spotlight.x = pointer.x;
+    //     spotlight.y = pointer.y;
+
+    // });
+    
+    
+
+    
+
 
     sprite.on('pointerdown', function(pointer) {
         let circle = new Phaser.Geom.Circle(pointer.x, pointer.y, radius)
@@ -90,6 +121,9 @@ function create() {
             graphics.strokeCircleShape(circles[i])
         }
     }
+
+
+    
 }
 
 
