@@ -8,7 +8,7 @@ var config = {
     scene: {
         preload: preload,
         create: create,
-        update: update
+        // update: update
     }
 }
 
@@ -64,30 +64,13 @@ function create() {
     // sprite.inputEnabled = true
     sprite.setInteractive()
 
-    black = this.add.image(815, 745, 'bg')
+    black = this.add.sprite(815, 745, 'bg')
     black.setDisplaySize(350, 235)
+    black.setInteractive()
 
-
-    spotlight = this.make.sprite({
-        x: 815,
-        y: 745,
-        key: 'mask',
-        add: false
+    black.on('pointerout', function(pointer) {
+        black.destroy()
     })
-
-
-    // black.mask = new Phaser.Display.Masks.BitmapMask(this, spotlight);
-
-    // this.input.on('pointermove', function (pointer) {
-
-    //     spotlight.x = pointer.x;
-    //     spotlight.y = pointer.y;
-
-    // });
-    
-    
-
-    
 
 
     sprite.on('pointerdown', function(pointer) {
