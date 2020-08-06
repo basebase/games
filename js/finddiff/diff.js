@@ -51,13 +51,17 @@ var circlesTmp = []
 var graphics
 var radius = 30
 var scoreText
+var retryText
+var gameOverText
 var score = 0
+var retry = 3
 
 function create() {
 
     
     
-    scoreText = this.add.text(200, 0, '分数: 0', {fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', fontSize: '30px'})
+    scoreText = this.add.text(200, -4, '分数: ' + score, {fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', fontSize: '30px'})
+    retryText = this.add.text(600, -4, '次数: ' + retry, {fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', fontSize: '30px'})
     
     let sprite = this.add.sprite(500, 510, 'sc1')
     graphics = this.add.graphics({ fillStyle: { color: 0xff0000 }, lineStyle: { width: 2, color: 0x00ff00 } })
@@ -84,6 +88,13 @@ function create() {
     sprite.on('pointerup', function(pointer) {
         if (circlesTmp.length === 2) {
             if (!checkClickPointerIsDiffPoint(circlesTmp)) {
+                retry -= 1
+                if (retry <= 0) {
+                    sprite.disableInteractive()
+                }
+                
+                retryText.setText("次数: " + retry)
+
                 circlesTmp.forEach(function (circle) {
                     circle.setEmpty()
                 })
