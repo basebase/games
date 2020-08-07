@@ -41,11 +41,13 @@ function preload() {
     this.load.image('sc1', 'sc1.jpg')
     this.load.image('bg', 'bg.jpeg')
     this.load.image('mask', 'mask1.png')
+    this.load.image('fail', 'fail.jpg')
+    this.load.image('restart', 'restart.jpeg')
 }
 
 
 var black
-var spotlight
+var sprite
 var circles = []
 var circlesTmp = []
 var graphics
@@ -56,6 +58,9 @@ var gameOverText
 var score = 0
 var retry = 3
 
+var fail
+var restart
+
 function create() {
 
     
@@ -63,7 +68,7 @@ function create() {
     scoreText = this.add.text(200, -4, '分数: ' + score, {fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', fontSize: '30px'})
     retryText = this.add.text(600, -4, '次数: ' + retry, {fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', fontSize: '30px'})
     
-    let sprite = this.add.sprite(500, 510, 'sc1')
+    sprite = this.add.sprite(500, 510, 'sc1')
     graphics = this.add.graphics({ fillStyle: { color: 0xff0000 }, lineStyle: { width: 2, color: 0x00ff00 } })
     // sprite.inputEnabled = true
     sprite.setInteractive()
@@ -71,6 +76,10 @@ function create() {
     black = this.add.sprite(815, 745, 'bg')
     black.setDisplaySize(350, 235)
     black.setInteractive()
+
+    fail = this.add.image(500, 478, 'fail').setVisible(false)
+    restart = this.add.sprite(691, 700, 'restart')
+    restart.setCrop(55, 105, 115, 35).setInteractive().setVisible(false)
 
     black.on('pointerout', function(pointer) {
         black.destroy()
@@ -85,12 +94,22 @@ function create() {
         console.log("鼠标点击了 ", circles)
     })
 
+    restart.on('pointerdown', function(pointer) {
+        console.log("重新开始...", this)
+        score = 0
+        retry = 3
+        this.scene.scene.restart()
+    })
+
     sprite.on('pointerup', function(pointer) {
         if (circlesTmp.length === 2) {
             if (!checkClickPointerIsDiffPoint(circlesTmp)) {
                 retry -= 1
                 if (retry <= 0) {
                     sprite.disableInteractive()
+                    sprite.tint = Math.random() * 0xffffff
+                    fail.setVisible(true)
+                    restart.setVisible(true)
                 }
                 
                 retryText.setText("次数: " + retry)
@@ -115,15 +134,7 @@ function create() {
             graphics.strokeCircleShape(circles[i])
         }
     }
-
-
-    
 }
-
-
-
-
-
 
 
 function checkClickPointerIsDiffPoint(circles) {
